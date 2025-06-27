@@ -396,7 +396,8 @@ class RR_OT_DiagnosticsFixNgons(RecRoomDiagnosticOperator):
             mesh.hide_set(False)
 
             bpy.ops.object.mode_set(mode="EDIT")
-
+            # Reveal any potentially hiding faces
+            bpy.ops.mesh.reveal()
             # Select ngons and fix
             bpy.ops.mesh.select_all(action="DESELECT")
             bpy.ops.mesh.select_face_by_sides(type="GREATER")
