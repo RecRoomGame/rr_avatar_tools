@@ -14,7 +14,7 @@ from rr_avatar_tools.avatar.operators.base import (
 )
 
 from rr_avatar_tools.utils import put_file_in_known_good_state
-
+from rr_avatar_tools import handlers
 
 class RR_OT_CreateAvatarItem(RecRoomAvatarMeshOperator):
     """Set up selected meshes as a new item. Select all LODs for a single item before running this command"""
@@ -255,9 +255,21 @@ class RR_OT_CreateFullBodyAvatarItem(RecRoomAvatarMeshOperator):
                 body_mesh.select_set(True)
                 old_active = bpy.context.view_layer.objects.active
                 bpy.context.view_layer.objects.active = body_mesh
+                
+                # Cache and make Culling Groups visible.
+                mask_selection = [m.select for m in bpy.context.scene.mask_list]
+                for i in range(len(bpy.context.scene.mask_list)):
+                    bpy.context.scene.mask_list[i].select = True
+                handlers.update_mask_modifiers(bpy.context.scene)
+
 
                 # Transfer weights
                 bpy.ops.rr.weights_transfer_weights_from_active_mesh()
+
+                # Restore disabled Culling Groups 
+                for i, select in enumerate(mask_selection):
+                    bpy.context.scene.mask_list[i].select = select
+                handlers.update_mask_modifiers(bpy.context.scene)
 
                 # Clear body mesh active and selection
                 bpy.context.view_layer.objects.active = old_active
