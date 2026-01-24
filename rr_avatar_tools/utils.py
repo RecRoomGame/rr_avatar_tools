@@ -101,6 +101,12 @@ def put_file_in_known_good_state(func):
         if mode and mode != "OBJECT":
             bpy.ops.object.mode_set(mode="OBJECT")
 
+        # Checks and Remove all animation data from Object
+        obj = bpy.context.active_object if bpy.context.active_object else None
+        if obj and obj.animation_data and any([obj.animation_data.action, obj.animation_data.drivers, obj.animation_data.nla_tracks]):
+            obj.animation_data_clear()
+        
+
         # Cache current state
         active = bpy.context.active_object
         collections = [CollectionState(c) for c in rr_avatar_tools.data.collections]
